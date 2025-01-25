@@ -3,10 +3,14 @@ name: Deploy Terraform Resources on AWS
 on:
   push:
     branches:
-      - main
+      - main/terraform-projects/*
   pull_request:
     branches:
-      - main
+      - main/terraform-projects/*
+
+permissions:
+  id-token: write
+  contents: read
 
 jobs:
   terraform:
@@ -22,7 +26,7 @@ jobs:
           terraform_version: '1.5.0'
 
       - name: AWS Credentials Setup
-        uses: aws-actions/configure-aws-credentials@v1
+        uses: aws-actions/configure-aws-credentials@v4
         with:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
@@ -33,5 +37,6 @@ jobs:
         run: make verify
 
       - name: Apply Terraform
+         if: ${{ github.ref == 'refs/heads/main' }}
         working-directory: .\terraform-projects\tf-s3-site
         run: make deploy
