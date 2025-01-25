@@ -3,10 +3,10 @@ name: Deploy Terraform Resources on AWS
 on:
   push:
     branches:
-      - main/terraform-projects/*
+      - main
   pull_request:
     branches:
-      - main/terraform-projects/*
+      - main
 
 permissions:
   id-token: write
