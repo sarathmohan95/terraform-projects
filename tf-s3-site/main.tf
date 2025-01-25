@@ -5,22 +5,18 @@ provider "aws" {
 resource "aws_s3_bucket_website_configuration" "static_website" {
   bucket = "msarathkumar-profile-site"
 
-  website {
-    index_document = "./src/index.html"
-  }
-
-  tags = {
-    Name = "Sarathkumar Site"
+  index_document {
+    suffix = "./src/index.html"
   }
 }
 
 resource "aws_s3_bucket_object" "index_html" {
-  bucket = aws_s3_bucket.static_website.bucket
+  bucket = aws_s3_bucket_website_configuration.static_website.bucket
   key    = "index.html"
   source = "path/to/your/local/index.html" 
   acl    = "public-read"
 }
 
 output "website_url" {
-  value = aws_s3_bucket.static_website.website_endpoint
+  value = aws_s3_bucket_website_configuration.static_website.website_endpoint
 }
