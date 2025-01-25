@@ -4,3 +4,4 @@ verify:
 	terraform validate
 deploy:
 	terraform apply -auto-approve tfplan
+	
