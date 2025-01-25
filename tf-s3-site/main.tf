@@ -3,7 +3,7 @@ provider "aws" {
 }
 
 resource "aws_s3_bucket_website_configuration" "static_website" {
-  bucket = "msarathkumar-profile-site"
+  bucket = "msarathkumar-site"
 
   index_document {
     suffix = "./src/index.html"
