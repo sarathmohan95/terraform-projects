@@ -38,10 +38,10 @@ jobs:
           aws-region: ap-south-1
 
       - name: Terraform Init and Plan
-        working-directory: .\terraform-projects\tf-s3-site
+        working-directory: ./tf-s3-site
         run: make verify
 
       - name: Apply Terraform
         if: ${{ github.ref == 'refs/heads/main' }}
-        working-directory: .\terraform-projects\tf-s3-site
+        working-directory: ./tf-s3-site
         run: make deploy
