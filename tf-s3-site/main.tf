@@ -2,8 +2,8 @@ provider "aws" {
   region = "ap-south-1"  
 }
 
-resource "aws_s3_bucket" "static_website" {
-  bucket = "my-static-website-bucket"
+resource "aws_s3_bucket_website_configuration" "static_website" {
+  bucket = "msarathkumar-profile-site"
 
   website {
     index_document = "./src/index.html"
