@@ -4,9 +4,13 @@ on:
   push:
     branches:
       - main
+    paths-ignore:
+      - '.github/**'
   pull_request:
     branches:
       - main
+    paths-ignore:
+      - '.github/**'
 
 permissions:
   id-token: write
@@ -32,7 +36,7 @@ jobs:
       - name: Generate Matrix
         id: check-dirs
         run: |
-          echo "${{ steps.changed-files.outputs.all_changed_files }}" | jq -R -s -c 'split(",") | map(rtrimstr("\n"))' > directories.txt
+          echo "${{ steps.changed-files.outputs.all_changed_files }}" > directories.txt
           if [ -s directories.txt ]; then
             echo "dirs=$(cat directories.txt)" >> $GITHUB_OUTPUT`
           else
