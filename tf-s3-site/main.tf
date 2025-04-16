@@ -6,6 +6,6 @@ module "s3_site" {
   index_location = "${path.root}/src/index.html"
   index_object_acl = "public-read"
   supporting_file_key = "img/picture.jpeg"
-  supporting_file_location = "${path.root}/src/img/picture.JPEG"
+  supporting_file_location = "${path.root}/src/img/picture.jpeg"
   supporting_file_object_acl = "public-read"
 }
