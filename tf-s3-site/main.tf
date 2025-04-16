@@ -4,8 +4,8 @@ module "s3_site" {
   bucket = "msarathkumar-site"
   index_key = "index.html"
   index_location = "${path.root}/src/index.html"
-  index_acl = "public-read"
+  index_object_acl = "public-read"
   supporting_file_key = "img/picture.JPEG"
   supporting_file_location = "${path.root}/src/img/picture.JPEG"
-  supporting_file_acl = "public-read"
+  supporting_file_object_acl = "public-read"
 }
