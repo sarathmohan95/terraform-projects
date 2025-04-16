@@ -1,5 +1,5 @@
 module "s3_site" {
-  source = "git::https://https://github.com/sarathmohan95/terraform-modules.git//s3-site?ref=v0.0.2"
+  source = "git::https://github.com/sarathmohan95/terraform-modules.git//s3-site?ref=v0.0.2"
   region = "ap-south-1"
   bucket = "msarathkumar-site"
   index_key = "index.html"
