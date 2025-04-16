@@ -16,9 +16,6 @@ jobs:
   generate-changed-files:
     runs-on: ubuntu-latest
     name: Generate Changed Files
-    permissions:
-      contents: 'write'
-      id-token: 'read'
     outputs:
       dirs: ${{ steps.check-dirs.output.dirs }}
     steps:
