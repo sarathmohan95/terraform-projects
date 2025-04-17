@@ -34,16 +34,11 @@ jobs:
         with:
           dir_names: true
           dir_names_max_depth: 1
-
-      - name: Debug changed dirs
-        run: |
-          echo "Dirs: ${{ steps.changed-files.outputs.all_changed_dirs }}"
-          echo "Files: ${{ steps.changed-files.outputs.all_changed_files }}"
       
       - name: Generate matrix from changed directories
         id: generate-matrix
         run: |
-          dirs="${{ steps.changed-files.outputs.all_changed_dirs }}"
+          dirs="${{ steps.changed-files.outputs.all_changed_files }}"
 
           if [ -z "$dirs" ]; then
             echo "No changed directories. Setting empty matrix."
