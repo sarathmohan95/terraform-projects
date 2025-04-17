@@ -45,7 +45,8 @@ jobs:
             echo 'matrix=[]' >> $GITHUB_OUTPUT
           else
             echo "Found changed dirs: $dirs"
-            json=$(echo "$dirs" | tr ',' '\n' | jq -R -s -c 'split("\n")[:-1]')
+            json=$(echo "$dirs" | tr ',' '\n' | grep -v '^$' | jq -R -s -c 'split("\n")')    
+            echo "Final JSON matrix: $json"
             echo "matrix=$json" >> $GITHUB_OUTPUT
           fi
   terraform:
