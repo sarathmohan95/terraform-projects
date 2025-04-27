@@ -1,0 +1,154 @@
+name: Deploy Terraform Resources on AWS
+
+on:
+  push:
+    branches:
+      - main
+    paths-ignore:
+      - '.github/**'
+  pull_request:
+    branches:
+      - main
+    paths-ignore:
+      - '.github/**'
+
+permissions:
+  id-token: write
+  contents: read
+
+# jobs:
+#   generate-changed-files:
+#     runs-on: ubuntu-latest
+#     name: Generate Changed Files
+#     outputs:
+#       dirs: ${{ steps.check-dirs.output.dirs }}
+#     steps:
+#       - name: Checkout repository
+#         uses: actions/checkout@v4
+#         with:
+#           fetch-depth: 0
+
+#       - name: Get changed directories
+#         id: changed-files
+#         uses: tj-actions/changed-files@v46.0.3
+#         with:
+#           dir_names: true
+#           dir_names_max_depth: 1
+      
+#       - name: Generate matrix from changed directories
+#         id: generate-matrix
+#         run: |
+#           dirs="${{ steps.changed-files.outputs.all_changed_files }}"
+
+#           if [ -z "$dirs" ]; then
+#             echo "No changed directories. Setting empty matrix."
+#             echo 'matrix=[]' >> $GITHUB_OUTPUT
+#           else
+#             echo "Found changed dirs: $dirs"
+#             json=$(echo "$dirs" | tr ',' '\n' | grep -v '^$' | jq -R -s -c 'split("\n")')    
+#             echo "Final JSON matrix: $json"
+#             echo "matrix=$json" >> $GITHUB_OUTPUT
+#           fi
+#   terraform:
+#     runs-on: ubuntu-latest
+#     needs: generate-changed-files
+#     if: needs.generate-changed-files.outputs.matrix != '[]'
+#     strategy:
+#       matrix:
+#         dir: ${{ fromJson(needs.generate-changed-files.outputs.matrix) }}
+#     steps:
+#       - name: Checkout repository
+#         uses: actions/checkout@v3
+
+#       - name: Set up Terraform
+#         uses: hashicorp/setup-terraform@v2
+#         with:
+#           terraform_version: '1.5.0'
+      
+#       - name: Debug AWS Credentials
+#         run: |
+#           echo "AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}"
+
+
+#       - name: AWS Credentials Setup
+#         uses: aws-actions/configure-aws-credentials@v4
+#         with:
+#           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+#           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+#           aws-region: ap-south-1
+
+#       - name: Terraform Init and Plan
+#         working-directory: ${{ matrix.dir }}
+#         run: make verify
+
+#       - name: Apply Terraform
+#         if: ${{ github.ref == 'refs/heads/main' }}
+#         working-directory: ${{ matrix.dir }}
+#         run: make deploy
+
+
+jobs:
+  terraform:
+    name: Terraform Plan and Apply
+    runs-on: ubuntu-latest
+
+    env:
+      TF_VERSION: 1.7.0
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Terraform
+        uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: ${{ env.TF_VERSION }}
+      
+      - name: Debug AWS Credentials
+        run: |
+          echo "AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}"
+
+      - name: AWS Credentials Setup
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ap-south-1
+
+      - name: Get changed files
+        id: changed-files
+        uses: tj-actions/changed-files@v44
+        with:
+          separator: ","
+
+      - name: Find changed directories
+        id: set-dir
+        run: |
+          echo "Processing changed files..."
+          
+          # Get list of changed files
+          FILES="${{ steps.changed-files.outputs.all_changed_files }}"
+          echo "Changed files: $FILES"
+
+          # Extract unique directories
+          DIRS=$(echo "$FILES" | tr "," "\n" | awk -F/ '{print $1}' | uniq)
+          echo "Changed directories: $DIRS"
+
+          if [ -z "$DIRS" ]; then
+            echo "No directories found, exiting..."
+            exit 1
+          fi
+
+          FIRST_DIR=$(echo "$DIRS" | head -n1)
+          echo "First directory: $FIRST_DIR"
+
+          echo "DIR=$FIRST_DIR" >> $GITHUB_ENV
+
+      - name: Terraform Init and Plan
+        working-directory: ${{ env.DIR }}
+        run: make verify
+
+      - name: Terraform Apply
+        if: github.ref == 'refs/heads/main'
+        working-directory: ${{ env.DIR }}
+        run: make deploy
