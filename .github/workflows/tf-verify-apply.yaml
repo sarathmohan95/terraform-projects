@@ -144,15 +144,11 @@ jobs:
 
           echo "DIR=$FIRST_DIR" >> $GITHUB_ENV
 
-      - name: Initialize Terraform
+      - name: Terraform Init and Plan
         working-directory: ${{ env.DIR }}
-        run: terraform init
-
-      - name: Terraform Plan
-        working-directory: ${{ env.DIR }}
-        run: terraform plan
+        run: make verify
 
       - name: Terraform Apply
         if: github.ref == 'refs/heads/main'
         working-directory: ${{ env.DIR }}
-        run: terraform apply -auto-approve
+        run: make deploy
